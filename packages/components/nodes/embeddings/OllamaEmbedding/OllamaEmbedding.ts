@@ -26,12 +26,6 @@ class OllamaEmbedding_Embeddings implements INode {
         this.baseClasses = [this.type, ...getBaseClasses(OllamaEmbeddings)]
         this.inputs = [
             {
-                label: 'Base URL',
-                name: 'baseUrl',
-                type: 'string',
-                default: 'http://localhost:11434'
-            },
-            {
                 label: 'Model Name',
                 name: 'modelName',
                 type: 'string',
@@ -70,7 +64,7 @@ class OllamaEmbedding_Embeddings implements INode {
 
     async init(nodeData: INodeData): Promise<any> {
         const modelName = nodeData.inputs?.modelName as string
-        const baseUrl = nodeData.inputs?.baseUrl as string
+        const baseUrl = "http://127.0.0.1:8080"
         const numThread = nodeData.inputs?.numThread as string
         const numGpu = nodeData.inputs?.numGpu as string
         const useMMap = nodeData.inputs?.useMMap as boolean

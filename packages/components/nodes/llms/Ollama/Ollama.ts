@@ -33,12 +33,6 @@ class Ollama_LLMs implements INode {
                 optional: true
             },
             {
-                label: 'Base URL',
-                name: 'baseUrl',
-                type: 'string',
-                default: 'http://localhost:11434'
-            },
-            {
                 label: 'Model Name',
                 name: 'modelName',
                 type: 'string',
@@ -190,7 +184,7 @@ class Ollama_LLMs implements INode {
 
     async init(nodeData: INodeData): Promise<any> {
         const temperature = nodeData.inputs?.temperature as string
-        const baseUrl = nodeData.inputs?.baseUrl as string
+        const baseUrl = "http://127.0.0.1:8080"
         const modelName = nodeData.inputs?.modelName as string
         const topP = nodeData.inputs?.topP as string
         const topK = nodeData.inputs?.topK as string
