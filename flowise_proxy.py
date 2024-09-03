@@ -1,9 +1,7 @@
-import os
-import time
-from typing import Iterable
-from flask import Flask, json, request, Response
-import requests
 import argparse
+import json
+import requests
+from flask import Flask, request, Response
 
 app = Flask(__name__)
 
@@ -12,23 +10,25 @@ app = Flask(__name__)
 @app.route('/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'])
 def proxy(path):
     target_url = f'https://modelyo-r:3003/{path}'
-    print(target_url)
     req_data = request.get_json(force=True)
     if req_data is None:
         return {"error": "Invalid JSON payload"}, 400
+    headers = {key: value for key,
+               value in request.headers if key != 'Host'}
+    print(headers)
 
-    response = requests.post(
-        url=target_url,
-        headers={key: value for key,
-                 value in request.headers if key != 'Host'},
-        json=req_data,
-        verify=args['ca'],
-        cert=(args['cert'],
-              args['key']),
-        timeout=900
-    )
-    response_content = Response(response)
-    return response_content
+    def get_stream():
+        print('start')
+        with requests.post(url=target_url, json=req_data, headers=headers,  verify=args['ca'], cert=(args['cert'], args['key']), stream=True, timeout=900) as test:
+            print('in request')
+            test.raise_for_status()
+            for line in test.iter_lines():
+                if line:
+                    stream_data = json.loads(line.decode('utf-8'))
+                    yield f"{json.dumps(stream_data)}\n"
+            print("done iter")
+        print("done request")
+    return Response(get_stream(), mimetype='application/json')
 
 
 if __name__ == '__main__':
